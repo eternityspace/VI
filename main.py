@@ -15,7 +15,8 @@ FILE_TYPES_AND_EXTENSIONS = {
 
 
 def normalize(name: str):
-    '''убирает'''
+    '''normalize'''
+
     normalized_name = name
     CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
     TRANSLATION = ("a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
@@ -36,6 +37,7 @@ def normalize(name: str):
 
 
 def sorting_files(root_path, path):
+    '''sorting files and folder'''
 
     if path.exists():
         for item in path.iterdir():
@@ -105,6 +107,8 @@ def sorting_files(root_path, path):
 
 
 def type_checker(extension: str):
+    '''checking type of file'''
+
     for file_type, list_of_extensions in FILE_TYPES_AND_EXTENSIONS.items():
 
         if extension in list_of_extensions:
@@ -118,7 +122,6 @@ def main():
     try:
 
         path = Path(sys.argv[1])
-        # path = Path("d:\Projects\VI\hw")
         sorting_files(path, path)
 
     except IndexError:
