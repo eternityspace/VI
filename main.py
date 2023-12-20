@@ -4,7 +4,6 @@ import re
 import shutil
 import sys
 from pathlib import Path
-from pprint import pprint
 
 FILE_TYPES_AND_EXTENSIONS = {
     'archives': ['ZIP', 'GZ', 'TAR', 'RAR'],
@@ -15,6 +14,7 @@ FILE_TYPES_AND_EXTENSIONS = {
 }
 
 types_and_extensions_folder_result = {}
+files_due_to_categories = {'archives': [], 'audio': [], 'documents': [], 'images': [], 'video': []}
 
 
 def normalize(name: str):
@@ -38,14 +38,33 @@ def normalize(name: str):
     return ''.join(normalized_name)
 
 
-def print_to_terminal(result):
+def print_to_terminal(extenions_result):
 
-    for key, value in result.items():
-        print(f'{key}: ')
-        for item in sorted(value.items(), key=lambda kv: kv[1], reverse=True):
-            print(' ' * 10, item)
-    # pprint(result, width=1)
+    known_extensions = []
+    unknown_extensions = []
 
+    for category, extensions in extenions_result.items():
+        
+        if category in FILE_TYPES_AND_EXTENSIONS:
+
+            known_extensions.append(list(extensions.keys()))
+        else:
+
+            unknown_extensions.append(list(extensions.keys()))
+        
+
+        print(f'\n\n{category} {list(extensions.keys())}:\n')
+
+        for file_type in files_due_to_categories:
+
+            if file_type == category:
+
+                print(*files_due_to_categories[category])
+
+    
+    print(f'\n\nKnown_extensions: {sum(known_extensions, [])}\n')
+    print(f'Unknown_extensions: {sum(unknown_extensions, [])}\n')
+    
 
 def sorting_files(root_path, path):
     '''sorting files and folder'''
@@ -62,6 +81,14 @@ def sorting_files(root_path, path):
                     file_name = normalize(item.stem)
                     file_extension = item.suffix
                     file_type = type_checker(file_extension[1:].upper())
+
+                    if file_type in files_due_to_categories:
+
+                        files_due_to_categories[file_type].append(file_name+file_extension)
+
+                    else:
+
+                        files_due_to_categories[file_type] = [file_name+file_extension]
 
                     new_dir_path = root_path / file_type
                     new_file_path = new_dir_path / (file_name + file_extension)
@@ -113,7 +140,7 @@ def sorting_files(root_path, path):
         print(f'The path that you tried to reach does not exist... {path}')
 
 
-def type_checker(extension: str):
+def type_checker(extension):
     '''checking type of file'''
 
     for file_type, list_of_extensions in FILE_TYPES_AND_EXTENSIONS.items():
